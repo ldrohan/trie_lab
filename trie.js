@@ -33,8 +33,8 @@ Trie.prototype.getWords = function(words, currentWord){
   
   for (var i in this.characters){
     var child = this.characters[i];
-    var isAWord = currentWord + i;
-    child.getWords(words, isAWord);
+    var newCurrWord = currentWord + i;
+    words.concat(child.getWords(words, newCurrWord));
   }
   return words;
   // This function will return all the words which are
@@ -44,6 +44,16 @@ Trie.prototype.getWords = function(words, currentWord){
 };
 
 Trie.prototype.find = function(word, index){
+  index = index || 0;
+  var char = word[index];
+  if(this.characters[char]){
+    return this.characters[char].find(word, index + 1);
+  } else if(index === word.length){
+    return this;
+  } else {
+    return false;
+  }
+
   // This function will return the node in the trie
   // which corresponds to the end of the passed in word.
 
@@ -51,6 +61,19 @@ Trie.prototype.find = function(word, index){
 };
 
 Trie.prototype.autoComplete = function(prefix){
+  prefix = prefix || "";
+
+  var prefixNode = this.find(prefix);
+
+  if(prefixNode !== false) {
+    results = prefixNode.getWords()
+    for (var i = 0; i < results.length; i++) {
+      results[i] = prefix + results[i];
+    }
+    return results;
+  } else {
+    return [];
+  }
   // This function will return all completions 
   // for a given prefix.
   // It should use find and getWords.
